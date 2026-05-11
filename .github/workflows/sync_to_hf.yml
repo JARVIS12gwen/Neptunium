@@ -16,21 +16,25 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 1. Clean up problematic binary files for HF
-          rm -rf build/win32
-          rm -rf resources/win32
-          rm -rf resources/darwin
-          rm -rf resources/linux
-          rm -rf resources/server
+          # 1. Delete all the binary junk
+          rm -rf build
+          rm -rf resources
+          rm -rf void_icons
+          rm -rf scripts/appimage
           find . -name "*.exe" -type f -delete
           find . -name "*.ico" -type f -delete
           find . -name "*.icns" -type f -delete
+          find . -name "*.png" -type f -delete
+          find . -name "*.bmp" -type f -delete
           
-          # 2. Setup git and commit the slim version
+          # 2. START A FRESH REPO (This wipes the binary history)
+          rm -rf .git
+          git init
           git config --global user.email "bot@neptunium.ai"
           git config --global user.name "Neptunium Bot"
+          git checkout -b main
           git add .
-          git commit -m "Slimming down for Hugging Face" || echo "No changes to commit"
+          git commit -m "Fresh clean build for Hugging Face"
           
-          # 3. Push to the Space
+          # 3. Force push this brand new "clean" history
           git push --force https://jessecodesometimes:$HF_TOKEN@huggingface.co/spaces/jessecodesometimes/Neptunium main
