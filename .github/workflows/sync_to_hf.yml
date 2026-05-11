@@ -15,4 +15,22 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://jessecodesometimes:$HF_TOKEN@huggingface.co/spaces/jessecodesometimes/Neptunium main
+        run: |
+          # 1. Clean up problematic binary files for HF
+          rm -rf build/win32
+          rm -rf resources/win32
+          rm -rf resources/darwin
+          rm -rf resources/linux
+          rm -rf resources/server
+          find . -name "*.exe" -type f -delete
+          find . -name "*.ico" -type f -delete
+          find . -name "*.icns" -type f -delete
+          
+          # 2. Setup git and commit the slim version
+          git config --global user.email "bot@neptunium.ai"
+          git config --global user.name "Neptunium Bot"
+          git add .
+          git commit -m "Slimming down for Hugging Face" || echo "No changes to commit"
+          
+          # 3. Push to the Space
+          git push --force https://jessecodesometimes:$HF_TOKEN@huggingface.co/spaces/jessecodesometimes/Neptunium main
